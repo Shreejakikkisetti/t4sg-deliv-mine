@@ -14,6 +14,8 @@ import * as React from 'react';
 import { useState } from 'react';
 import { categories } from '../utils/categories';
 import { addEntry } from '../utils/mutations';
+import { updateEntry } from '../utils/mutations';
+
 
 // Modal component for individual entries.
 
@@ -30,12 +32,15 @@ export default function EntryModal({ entry, type, user }) {
 
    // TODO: For editing, you may have to add and manage another state variable to check if the entry is being edited.
 
+   const [isedit, setEdit] = useState(false);
+
    const [open, setOpen] = useState(false);
    const [name, setName] = useState(entry.name);
    const [link, setLink] = useState(entry.link);
    const [description, setDescription] = useState(entry.description);
    const [category, setCategory] = React.useState(entry.category);
 
+   
    // Modal visibility handlers
 
    const handleClickOpen = () => {
@@ -66,7 +71,33 @@ export default function EntryModal({ entry, type, user }) {
       handleClose();
    };
 
-   // TODO: Add Edit Mutation Handler
+
+   const handleEdit = () => {
+      setEdit(true);
+      
+      // addEntry(newEntry).catch(console.error);
+      // handleClose();
+       
+      // const newEntry = {
+      //    name: document.getElementById("name").value,
+      //    link:  document.getElementById("link").value,
+      //    description:  document.getElementById("description").value,
+      //    user: user?.displayName ? user?.displayName : "GenericUser",
+      //    category: document.getElementById("demo-simple-select-label").value,
+      //    userid: user?.uid,
+      // };
+
+      // addEntry(newEntry).catch(console.error);
+      // handleClose();
+      // // handleClose();
+      // // this.setName("BOB")
+
+
+   };   // TODO: Add Edit Mutation Handler
+   const handleSave = () => {
+      // checkedit = true;
+   }
+   
 
    // TODO: Add Delete Mutation Handler
 
@@ -79,27 +110,55 @@ export default function EntryModal({ entry, type, user }) {
          <OpenInNewIcon />
       </IconButton>
          : type === "add" ? <Button variant="contained" onClick={handleClickOpen}>
-            Add entry
+            Add entryfff
          </Button>
             : null;
 
    const actionButtons =
-      type === "edit" ?
+      type === "edit" ? (
          <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleClose}>Delete</Button>
+
+            {isedit? (
+               <Button variant = "contained" onClick={handleEdit}>
+                  confirm
+               </Button>
+            ) : (
+               <Button variant = "contained" onClick={handleEdit}>
+                  Edit
+               </Button>
+
+            )}
+
+
+
          </DialogActions>
-         : type === "add" ?
+
+         ): type === "add" ?
             <DialogActions>
                <Button onClick={handleClose}>Cancel</Button>
                <Button variant="contained" onClick={handleAdd}>Add Entry</Button>
             </DialogActions>
             : null;
 
+   // const editButton = 
+   //    type === "edit" ?
+   //       <Button onClick = {handleEdit}> Edit</Button>
+   //       : null;
+
+
+
+
+         
+
    return (
       <div>
          {openButton}
          <Dialog open={open} onClose={handleClose}>
+
             <DialogTitle>{type === "edit" ? name : "Add Entry"}</DialogTitle>
+            
             <DialogContent>
                {/* TODO: Feel free to change the properties of these components to implement editing functionality. The InputProps props class for these MUI components allows you to change their traditional CSS properties. */}
                <TextField
@@ -109,6 +168,9 @@ export default function EntryModal({ entry, type, user }) {
                   fullWidth
                   variant="standard"
                   value={name}
+                  InputProps={{
+                     readOnly: !isedit,
+                   }}
                   onChange={(event) => setName(event.target.value)}
                />
                <TextField
@@ -119,6 +181,9 @@ export default function EntryModal({ entry, type, user }) {
                   fullWidth
                   variant="standard"
                   value={link}
+                  InputProps={{
+                     readOnly: !isedit,
+                   }}
                   onChange={(event) => setLink(event.target.value)}
                />
                <TextField
@@ -130,6 +195,9 @@ export default function EntryModal({ entry, type, user }) {
                   multiline
                   maxRows={8}
                   value={description}
+                  InputProps={{
+                     readOnly: !isedit,
+                   }}
                   onChange={(event) => setDescription(event.target.value)}
                />
 
@@ -140,6 +208,7 @@ export default function EntryModal({ entry, type, user }) {
                      id="demo-simple-select"
                      value={category}
                      label="Category"
+                     IconComponent={() => <FormControl style={{ display: "none" }} />}
                      onChange={(event) => setCategory(event.target.value)}
                   >
                      {categories.map((category) => (<MenuItem value={category.id}>{category.name}</MenuItem>))}
@@ -147,6 +216,7 @@ export default function EntryModal({ entry, type, user }) {
                </FormControl>
             </DialogContent>
             {actionButtons}
+
          </Dialog>
       </div>
    );
