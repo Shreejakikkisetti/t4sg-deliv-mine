@@ -14,7 +14,7 @@ export const emptyEntry = {
 export async function addEntry(entry) {
 
    await addDoc(collection(db, "entries"), {
-      name: "hi",
+      name: entry.name,
       link: entry.link,
       description: entry.description,
       user: entry.user,

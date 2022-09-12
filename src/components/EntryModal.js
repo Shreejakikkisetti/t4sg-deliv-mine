@@ -1,4 +1,5 @@
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { confirmAlert } from 'react-confirm-alert'; // Import
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -16,6 +17,8 @@ import { categories } from '../utils/categories';
 import { addEntry } from '../utils/mutations';
 import { updateEntry } from '../utils/mutations';
 import { deleteEntry } from '../utils/mutations';
+import QRCode from "qrcode.react";
+
 
 
 
@@ -24,11 +27,31 @@ import { deleteEntry } from '../utils/mutations';
 /* EntryModal parameters:
 entry: Data about the entry in question
 type: Type of entry modal being opened. 
-   This can be "add" (for adding a new entry) or 
+   T`hi`s can be "add" (for adding a new entry) or 
    "edit" (for opening or editing an existing entry from table).
 user: User making query (The current logged in user). */
 
+
+
 export default function EntryModal({ entry, type, user }) {
+
+   const submit = () => {
+        confirmAlert({
+          title: 'Confirm to submit',
+          message: 'Are you sure to do this.',
+          buttons: [
+            {
+              label: 'Yes',
+            },
+            {
+              label: 'No',
+            }
+          ]
+        });
+      };
+
+
+    
 
    // State variables for modal status
 
@@ -59,6 +82,13 @@ export default function EntryModal({ entry, type, user }) {
    const handleClose = () => {
       setOpen(false);
    };
+
+   const alertModal = (event) => {
+      const result = submit("are you sure");
+      if(result == false) {
+         event.preventDefault();
+      }
+   }
 
    // Mutation handlers
 
@@ -107,10 +137,12 @@ export default function EntryModal({ entry, type, user }) {
    };
 
    const handleDelete = () => {
+      if (window.confirm("Are you sure you want to delete?")) {
+         deleteEntry(entry.id).catch(console.error);
+         handleClose();
+         setEdit(false);
+      }
 
-      deleteEntry(entry.id).catch(console.error);
-      handleClose();
-      setEdit(false);
 
 
    };
@@ -193,7 +225,7 @@ export default function EntryModal({ entry, type, user }) {
                <TextField
                   margin="normal"
                   id="link"
-                  label="Link"
+                  label="Links"
                   placeholder="e.g. https://google.com"
                   fullWidth
                   variant="standard"
@@ -202,6 +234,13 @@ export default function EntryModal({ entry, type, user }) {
                      readOnly:  type === "edit" ? !isedit : false,
                    }}
                   onChange={(event) => setLink(event.target.value)}
+               />
+               <QRCode value={link} style={{ marginRight: 50 }}
+                  label="QRCode"
+                  margin="normal"
+                  ariant="standard"
+                  fullWidth
+               
                />
                <TextField
                   margin="normal"
@@ -218,6 +257,8 @@ export default function EntryModal({ entry, type, user }) {
                   onChange={(event) => setDescription(event.target.value)}
                />
 
+
+              
                <FormControl fullWidth sx={{ "margin-top": 20 }}>
                   <InputLabel id="demo-simple-select-label">Category</InputLabel>
                   <Select
