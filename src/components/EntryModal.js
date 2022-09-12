@@ -15,6 +15,8 @@ import { useState } from 'react';
 import { categories } from '../utils/categories';
 import { addEntry } from '../utils/mutations';
 import { updateEntry } from '../utils/mutations';
+import { deleteEntry } from '../utils/mutations';
+
 
 
 // Modal component for individual entries.
@@ -39,6 +41,9 @@ export default function EntryModal({ entry, type, user }) {
    const [link, setLink] = useState(entry.link);
    const [description, setDescription] = useState(entry.description);
    const [category, setCategory] = React.useState(entry.category);
+
+   // const [isedit, setEdit] = useState(false);
+
 
    
    // Modal visibility handlers
@@ -69,6 +74,7 @@ export default function EntryModal({ entry, type, user }) {
 
       addEntry(newEntry).catch(console.error);
       handleClose();
+
    };
 
 
@@ -77,15 +83,6 @@ export default function EntryModal({ entry, type, user }) {
       
       // addEntry(newEntry).catch(console.error);
       // handleClose();
-       
-      // const newEntry = {
-      //    name: document.getElementById("name").value,
-      //    link:  document.getElementById("link").value,
-      //    description:  document.getElementById("description").value,
-      //    user: user?.displayName ? user?.displayName : "GenericUser",
-      //    category: document.getElementById("demo-simple-select-label").value,
-      //    userid: user?.uid,
-      // };
 
       // addEntry(newEntry).catch(console.error);
       // handleClose();
@@ -94,9 +91,29 @@ export default function EntryModal({ entry, type, user }) {
 
 
    };   // TODO: Add Edit Mutation Handler
-   const handleSave = () => {
-      // checkedit = true;
-   }
+   const handleConfirm = () => {
+      const newEntry = {
+         name: name,
+         link: link,
+         description: description,
+         category: category,
+         id: entry.id
+      };
+
+      updateEntry(newEntry).catch(console.error);
+      handleClose();
+      setEdit(false);
+
+   };
+
+   const handleDelete = () => {
+
+      deleteEntry(entry.id).catch(console.error);
+      handleClose();
+      setEdit(false);
+
+
+   };
    
 
    // TODO: Add Delete Mutation Handler
@@ -110,7 +127,7 @@ export default function EntryModal({ entry, type, user }) {
          <OpenInNewIcon />
       </IconButton>
          : type === "add" ? <Button variant="contained" onClick={handleClickOpen}>
-            Add entryfff
+            Add entry
          </Button>
             : null;
 
@@ -118,10 +135,10 @@ export default function EntryModal({ entry, type, user }) {
       type === "edit" ? (
          <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleClose}>Delete</Button>
+            <Button onClick={handleDelete}>Delete</Button>
 
             {isedit? (
-               <Button variant = "contained" onClick={handleEdit}>
+               <Button variant = "contained" onClick={handleConfirm}>
                   confirm
                </Button>
             ) : (
@@ -169,7 +186,7 @@ export default function EntryModal({ entry, type, user }) {
                   variant="standard"
                   value={name}
                   InputProps={{
-                     readOnly: !isedit,
+                     readOnly: type === "edit" ? !isedit : false,
                    }}
                   onChange={(event) => setName(event.target.value)}
                />
@@ -208,11 +225,15 @@ export default function EntryModal({ entry, type, user }) {
                      id="demo-simple-select"
                      value={category}
                      label="Category"
+                     inputProps={{
+                        readOnly: !isedit,
+                      }}
                      IconComponent={() => <FormControl style={{ display: "none" }} />}
                      onChange={(event) => setCategory(event.target.value)}
                   >
                      {categories.map((category) => (<MenuItem value={category.id}>{category.name}</MenuItem>))}
                   </Select>
+                  
                </FormControl>
             </DialogContent>
             {actionButtons}
