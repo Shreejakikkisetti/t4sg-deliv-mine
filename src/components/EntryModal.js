@@ -199,7 +199,7 @@ export default function EntryModal({ entry, type, user }) {
                   variant="standard"
                   value={link}
                   InputProps={{
-                     readOnly: !isedit,
+                     readOnly:  type === "edit" ? !isedit : false,
                    }}
                   onChange={(event) => setLink(event.target.value)}
                />
@@ -213,7 +213,7 @@ export default function EntryModal({ entry, type, user }) {
                   maxRows={8}
                   value={description}
                   InputProps={{
-                     readOnly: !isedit,
+                     readOnly: type === "edit" ? !isedit : false,
                    }}
                   onChange={(event) => setDescription(event.target.value)}
                />
@@ -226,7 +226,7 @@ export default function EntryModal({ entry, type, user }) {
                      value={category}
                      label="Category"
                      inputProps={{
-                        readOnly: !isedit,
+                        readOnly: type === "edit" ? !isedit : false,
                       }}
                      IconComponent={() => <FormControl style={{ display: "none" }} />}
                      onChange={(event) => setCategory(event.target.value)}
